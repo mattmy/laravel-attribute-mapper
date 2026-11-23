@@ -44,7 +44,7 @@ class MappingExampleRequest extends FormRequest
 }
 ```
 
-Add this preview route to `routes/web.php`, reusing any existing imports.
+Add this preview route to `routes/web.php`.
 
 ```php
 use App\Http\Requests\MappingExampleRequest;

@@ -44,7 +44,7 @@ class MappingExampleRequest extends FormRequest
 }
 ```
 
-將下方預覽路由加入 `routes/web.php`，重複的 `use` 只留一份。
+將下方預覽路由加入 `routes/web.php`。
 
 ```php
 use App\Http\Requests\MappingExampleRequest;
