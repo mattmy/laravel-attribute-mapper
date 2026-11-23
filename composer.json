@@ -1,7 +1,17 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "mattmy/laravel-attribute-mapper",
-    "description": "Map selected Laravel input to fillable Eloquent model attributes.",
+    "description": "Map validated Laravel Form Request fields to fillable Eloquent attributes using naming rules and aliases.",
+    "keywords": [
+        "laravel",
+        "eloquent",
+        "form-request",
+        "attribute-mapping",
+        "fillable",
+        "camelcase",
+        "snake-case"
+    ],
+    "homepage": "https://mattmy.github.io/laravel-attribute-mapper-doc/",
     "type": "library",
     "license": "MIT",
     "require": {
