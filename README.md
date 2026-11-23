@@ -1,0 +1,77 @@
+# Laravel Attribute Mapper
+
+[繁體中文](README.zh-TW.md)
+
+Laravel Attribute Mapper turns a Form Request's validated data into the attribute array you need to create or update an Eloquent model.
+
+- **Mapping based on Form Request and `$fillable`.** The mapper uses validated input and the model's fillable list to build the attribute array, so you have one fewer field list to maintain.
+- **Configurable input key styles.** `inputKeys()` sets the naming style. For example, `inputKeys(InputKeyStyle::Camel)` matches `camelCase` request keys to `snake_case` model attributes.
+- **Customizable mapped attributes.** You can keep or exclude specific attributes and add values from your app, such as the editor's ID or a default status.
+
+## Requirements
+
+| Laravel | Composer compatibility | PHP versions in the CI matrix |
+| --- | --- | --- |
+| 12.x | PHP 8.2 or later in the 8.x series | 8.2, 8.3, 8.4, 8.5 |
+| 13.x | PHP 8.3 or later in the 8.x series | 8.3, 8.4, 8.5 |
+
+## Installation
+
+```sh
+composer require mattmy/laravel-attribute-mapper
+```
+
+## Quick start
+
+Create this Form Request in `app/Http/Requests/MappingExampleRequest.php`.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class MappingExampleRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'startTime' => ['sometimes', 'date'],
+            'endTime' => ['sometimes', 'nullable', 'date'],
+        ];
+    }
+}
+```
+
+Add this preview route to `routes/web.php`, reusing any existing imports.
+
+```php
+use App\Http\Requests\MappingExampleRequest;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
+use Mattmy\FillMap\AttributeMapper;
+use Mattmy\FillMap\InputKeyStyle;
+
+Route::get('/mapping-example', static function (MappingExampleRequest $request): array {
+    $model = new class() extends Model
+    {
+        protected $fillable = ['start_time', 'end_time'];
+    };
+
+    return AttributeMapper::from($request)
+        ->forModel($model)
+        ->inputKeys(InputKeyStyle::Camel)
+        ->toArray();
+});
+```
+
+Visit `/mapping-example?startTime=2026-12-01&endTime=2026-12-02` to get `{"start_time":"2026-12-01","end_time":"2026-12-02"}`. Use the same mapping in your create and update controllers to build the attribute array.
+
+When your app already has the data in an array, you can pass that array to `AttributeMapper::from()`.
+
+## Documentation
+
+For other ways to read request data, change field mappings, or handle errors, see the [full documentation](https://mattmy.github.io/laravel-attribute-mapper-doc/guide/getting-started).
+
+[Changelog](CHANGELOG.md) · [MIT License](LICENSE)

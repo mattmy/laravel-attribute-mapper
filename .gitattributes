@@ -1,0 +1,13 @@
+* text=auto eol=lf
+*.md diff=markdown
+*.php diff=php
+/.github export-ignore
+/.phpunit.cache export-ignore
+/build export-ignore
+/composer.lock export-ignore
+/tests export-ignore
+/vendor export-ignore
+/.gitignore export-ignore
+/pint.json export-ignore
+/phpunit.xml.dist export-ignore
+/phpstan.neon.dist export-ignore
