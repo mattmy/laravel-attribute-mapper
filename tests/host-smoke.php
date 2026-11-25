@@ -24,7 +24,11 @@ use RuntimeException;
 require \getcwd() . '/vendor/autoload.php';
 require_once __DIR__ . '/Fixtures/UpdateRequest.php';
 
-/** Verifies an installed-package property even when PHP assertions are disabled. */
+/**
+ * Verifies an installed-package property even when PHP assertions are disabled.
+ *
+ * @throws RuntimeException
+ */
 function verify(bool $condition, string $description): void
 {
     if (! $condition) {
@@ -36,6 +40,8 @@ function verify(bool $condition, string $description): void
  * Extracts the Form Request and route from a README.
  *
  * @return list<string>
+ *
+ * @throws RuntimeException
  */
 function readmeQuickStart(string $readmeName): array
 {
