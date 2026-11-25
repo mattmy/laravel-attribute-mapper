@@ -7,8 +7,12 @@ namespace Mattmy\FillMap\Tests;
 use Closure;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\Validator;
 use Mattmy\FillMap\AttributeMapper;
 use Mattmy\FillMap\InputKeyStyle;
 use RuntimeException;
@@ -38,7 +42,7 @@ function medianMilliseconds(Closure $operation, int $rows): float
 
     \sort($samples);
 
-    return $samples[2];
+    return $samples[\intdiv(\count($samples), 2)];
 }
 
 \printf("PHP %s, Laravel %s, %s\n", \PHP_VERSION, InstalledVersions::getPrettyVersion('laravel/framework') ?? 'unknown', \PHP_OS_FAMILY);
@@ -93,11 +97,19 @@ foreach ([10, 100] as $width) {
 
     $request = new Request(request: $row);
     $keys = \array_keys($row);
+    $formRequest = FormRequest::create('/', 'POST', $row);
+    $validator = new Validator(new Translator(new ArrayLoader(), 'en'), $row, \array_fill_keys($keys, ['nullable', 'integer']));
+    if ($validator->validate() !== $row) {
+        throw new RuntimeException('The benchmark expects the validated request to preserve the input row.');
+    }
+
+    $formRequest->setValidator($validator);
     $operations = [
         'direct' => $direct,
         'array / class' => static fn () => $classChain()->toArray(),
         'array / instance' => static fn () => $instanceChain()->toArray(),
         'fill / instance' => static fn () => $instanceChain()->toModel(),
+        'validated input' => static fn () => AttributeMapper::from($formRequest),
         'body selection' => static fn () => AttributeMapper::fromRequestInput($request, $keys),
     ];
 
