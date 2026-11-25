@@ -110,13 +110,15 @@ final class AttributeOutputTest extends TestCase
         self::assertSame(['end_time' => null, '1.5' => $uuid], $base->setUuid($uuid, '1.5')->toArray());
     }
 
-    /** Keeps the original PHP semantics of nested merge references. */
-    public function test_merge_retains_nested_references(): void
+    /** Reflects changes to top-level and nested references in explicit additions. */
+    public function test_merge_retains_references(): void
     {
         $value = true;
-        $chain = AttributeMapper::from([])->forModel(MappingModel::class)->merge(['preferences' => [4 => &$value]]);
+        $chain = AttributeMapper::from([])->forModel(MappingModel::class)->merge(['preferences' => [4 => &$value], 'active' => &$value]);
+
         $value = false;
-        self::assertSame(['preferences' => [4 => false]], $chain->toArray());
+
+        self::assertSame(['preferences' => [4 => false], 'active' => false], $chain->toArray());
     }
 
     /** Normalizes every UUID source to a stable string and applies last-write precedence. */

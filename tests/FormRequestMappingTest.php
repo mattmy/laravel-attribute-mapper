@@ -89,22 +89,22 @@ final class FormRequestMappingTest extends TestCase
         }
     }
 
-    /** Captures the current result, while preserving references already in its nested values. */
+    /** Captures the current result and preserves its top-level and nested references. */
     public function test_captures_validated_result_at_construction(): void
     {
         $first = new UpdateRequest();
         $value = true;
         $factory = app(Factory::class);
         $validator = $this->createStub(Validator::class);
-        $validator->method('validated')->willReturn(['preferences' => ['email' => &$value]]);
+        $validator->method('validated')->willReturn(['preferences' => ['email' => &$value], 'active' => &$value]);
         $first->setValidator($validator);
         $source = AttributeMapper::from($first);
         $first->setValidator($factory->make([], []));
         $chain = $source->forModel(MappingModel::class);
-        self::assertSame(['preferences' => ['email' => true]], $chain->toArray());
+        self::assertSame(['preferences' => ['email' => true], 'active' => true], $chain->toArray());
 
         $value = false;
-        self::assertSame(['preferences' => ['email' => false]], $chain->toArray());
+        self::assertSame(['preferences' => ['email' => false], 'active' => false], $chain->toArray());
     }
 
     /** Applies input-key validation to a Form Request's validated data. */

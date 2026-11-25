@@ -246,13 +246,15 @@ final class AttributeMappingTest extends TestCase
         }
     }
 
-    /** Preserves PHP references in prepared values. */
-    public function test_prepared_nested_references_remain_live(): void
+    /** Reflects changes to top-level and nested references in prepared input. */
+    public function test_prepared_references_remain_live(): void
     {
         $value = true;
-        $chain = AttributeMapper::from(['preferences' => ['email' => &$value]])->forModel(MappingModel::class);
+        $chain = AttributeMapper::from(['preferences' => ['email' => &$value], 'active' => &$value])->forModel(MappingModel::class);
+
         $value = false;
-        self::assertSame(['preferences' => ['email' => false]], $chain->toArray());
+
+        self::assertSame(['preferences' => ['email' => false], 'active' => false], $chain->toArray());
     }
 }
 
