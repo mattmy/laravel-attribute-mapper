@@ -151,6 +151,16 @@ final class AttributeMappingTest extends TestCase
         $chain->inputKeys(InputKeyStyle::Exact)->inputKeys(InputKeyStyle::Camel)->toArray();
     }
 
+    /** Exact naming still detects aliases that reuse another fillable attribute's source key. */
+    public function test_detects_alias_collision_with_exact_keys(): void
+    {
+        $model = (new MappingModel())->fillable(['end_time', 'active']);
+        $chain = AttributeMapper::from([])->forModel($model)->inputKeys(InputKeyStyle::Exact);
+
+        $this->expectException(InvalidArgumentException::class);
+        $chain->aliases(['active' => 'end_time'])->toArray();
+    }
+
     /** Accepts an empty array but rejects an invalid top-level key immediately. */
     public function test_rejects_invalid_top_level_keys(): void
     {

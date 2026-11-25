@@ -337,16 +337,22 @@ final class AttributeMapper
         }
 
         $style = $this->style ?? self::defaultInputKeyStyle();
+        // Exact naming without aliases reuses the already unique fillable keys.
+        $sourceKeysCanCollide = $style !== InputKeyStyle::Exact || $aliases !== [];
         $outsideFillable = \array_diff_key($this->additions, $fillable);
         $sourceKeys = [];
         $attributes = [];
         foreach (\array_keys($fillable) as $attribute) {
-            $source = $aliases[$attribute] ?? self::deriveSourceKey($attribute, $style);
-            if (isset($sourceKeys[$source])) {
-                throw new InvalidArgumentException('Different fillable attributes map to the same source key.');
+            $source = $attribute;
+            if ($sourceKeysCanCollide) {
+                $source = $aliases[$attribute] ?? self::deriveSourceKey($attribute, $style);
+                if (isset($sourceKeys[$source])) {
+                    throw new InvalidArgumentException('Different fillable attributes map to the same source key.');
+                }
+
+                $sourceKeys[$source] = true;
             }
 
-            $sourceKeys[$source] = true;
             if (\array_key_exists($attribute, $this->additions)) {
                 $attributes[$attribute] = $this->additions[$attribute];
             } elseif (\array_key_exists($source, $this->input)) {
