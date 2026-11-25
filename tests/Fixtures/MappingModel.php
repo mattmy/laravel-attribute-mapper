@@ -22,7 +22,11 @@ class MappingModel extends Model
     /** @var array<string, string> */
     protected $casts = ['count' => 'integer'];
 
-    /** Records the current allow-list lookup, without reading a database. */
+    /**
+     * Records the current allow-list lookup, without reading a database.
+     *
+     * @return array<array-key, string>
+     */
     public function getFillable(): array
     {
         $this->fillableReads++;
@@ -30,7 +34,11 @@ class MappingModel extends Model
         return parent::getFillable();
     }
 
-    /** Captures the exact input before Eloquent applies its own rules. */
+    /**
+     * Captures the exact input before Eloquent applies its own rules.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
     public function fill(array $attributes): self
     {
         $this->received = $attributes;
