@@ -305,7 +305,9 @@ final class AttributeMapper
     private function withAdditions(array $attributes): self
     {
         $branch = clone $this;
-        $branch->additions = \array_replace($this->additions, $attributes);
+        $branch->additions = $this->additions === []
+            ? $attributes
+            : \array_replace($this->additions, $attributes);
 
         return $branch;
     }

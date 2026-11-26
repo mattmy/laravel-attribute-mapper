@@ -114,11 +114,15 @@ final class AttributeOutputTest extends TestCase
     public function test_merge_retains_references(): void
     {
         $value = true;
-        $chain = AttributeMapper::from([])->forModel(MappingModel::class)->merge(['preferences' => [4 => &$value], 'active' => &$value]);
+        $base = AttributeMapper::from([])->forModel(MappingModel::class);
+        $chain = $base->merge(['preferences' => [4 => &$value], 'active' => &$value, 'external_flag' => &$value]);
+        $branch = $chain->merge(['active' => true]);
 
         $value = false;
 
-        self::assertSame(['preferences' => [4 => false], 'active' => false], $chain->toArray());
+        self::assertSame([], $base->toArray());
+        self::assertSame(['preferences' => [4 => false], 'active' => false, 'external_flag' => false], $chain->toArray());
+        self::assertSame(['preferences' => [4 => false], 'active' => true, 'external_flag' => false], $branch->toArray());
     }
 
     /** Detaches output fields while retaining references held by the mapping chain. */
