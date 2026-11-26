@@ -161,6 +161,23 @@ final class RequestBodyMappingTest extends TestCase
         self::assertSame([$expected, $expected], [$afterFirstChange, $chain->toArray()]);
     }
 
+    /** Preserves string and integer keys that PHP can store separately. */
+    public function test_preserves_nested_integer_like_string_keys(): void
+    {
+        $key = '1';
+        $$key = ['label' => 'string key'];
+        $flag = true;
+        $preferences = \compact($key) + [1 => &$flag];
+        $request = new Request(request: ['preferences' => $preferences]);
+        $chain = AttributeMapper::fromRequestInput($request, ['preferences'])->forModel(MappingModel::class);
+        $flag = false;
+
+        $actual = $chain->toArray()['preferences'];
+        self::assertIsArray($actual);
+        self::assertSame(['1', 1], \array_keys($actual));
+        self::assertSame([['label' => 'string key'], true], \array_values($actual));
+    }
+
     /** Accepts larger legal selections and preserves all nested array keys. */
     public function test_preserves_broad_and_deep_values(): void
     {
