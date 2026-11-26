@@ -166,8 +166,9 @@ final class RequestBodyMappingTest extends TestCase
     {
         $key = '1';
         $$key = ['label' => 'string key'];
+        $stringKey = \array_filter(\get_defined_vars(), 'is_numeric', \ARRAY_FILTER_USE_KEY);
         $flag = true;
-        $preferences = \compact($key) + [1 => &$flag];
+        $preferences = $stringKey + [1 => &$flag];
         $request = new Request(request: ['preferences' => $preferences]);
         $chain = AttributeMapper::fromRequestInput($request, ['preferences'])->forModel(MappingModel::class);
         $flag = false;
