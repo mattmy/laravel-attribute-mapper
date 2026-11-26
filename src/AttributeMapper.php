@@ -257,8 +257,11 @@ final class AttributeMapper
     public function toArray(): array
     {
         [$attributes, $outsideFillable] = $this->map($this->resolveTarget());
+        foreach ($outsideFillable as $attribute => $value) {
+            $attributes[$attribute] = $value;
+        }
 
-        return $attributes + $outsideFillable;
+        return $attributes;
     }
 
     /**
@@ -302,7 +305,9 @@ final class AttributeMapper
     private function withAdditions(array $attributes): self
     {
         $branch = clone $this;
-        $branch->additions = \array_replace($this->additions, $attributes);
+        $branch->additions = $this->additions === []
+            ? $attributes
+            : \array_replace($this->additions, $attributes);
 
         return $branch;
     }
@@ -509,7 +514,7 @@ final class AttributeMapper
      * Checks selected body structure while copying it without PHP references.
      *
      * @param  array<string, true>  $activeReferences
-     * @return array<array-key, mixed>|bool|float|int|string|null
+     * @return ($value is array ? array<array-key, mixed> : bool|float|int|string|null)
      *
      * @throws InvalidArgumentException
      */
@@ -521,6 +526,20 @@ final class AttributeMapper
 
         if (! \is_array($value)) {
             throw new InvalidArgumentException('fromRequestInput() selected an unsupported value type.');
+        }
+
+        if (! \array_is_list($value)) {
+            foreach (\array_keys($value) as $key) {
+                if (\is_string($key) && (string) (int) $key === $key) {
+                    // Copy by position so PHP keeps keys that assignment would coerce.
+                    $items = self::copyBodyValue(\array_values($value), $activeReferences);
+                    $index = 0;
+
+                    return \array_map(static function () use ($items, &$index): mixed {
+                        return $items[$index++];
+                    }, $value);
+                }
+            }
         }
 
         $copy = [];

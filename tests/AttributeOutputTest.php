@@ -114,11 +114,41 @@ final class AttributeOutputTest extends TestCase
     public function test_merge_retains_references(): void
     {
         $value = true;
-        $chain = AttributeMapper::from([])->forModel(MappingModel::class)->merge(['preferences' => [4 => &$value], 'active' => &$value]);
+        $base = AttributeMapper::from([])->forModel(MappingModel::class);
+        $chain = $base->merge(['preferences' => [4 => &$value], 'active' => &$value, 'external_flag' => &$value]);
+        $branch = $chain->merge(['active' => true]);
 
         $value = false;
 
-        self::assertSame(['preferences' => [4 => false], 'active' => false], $chain->toArray());
+        self::assertSame([], $base->toArray());
+        self::assertSame(['preferences' => [4 => false], 'active' => false, 'external_flag' => false], $chain->toArray());
+        self::assertSame(['preferences' => [4 => false], 'active' => true, 'external_flag' => false], $branch->toArray());
+    }
+
+    /** Detaches output fields while retaining references held by the mapping chain. */
+    public function test_outputs_capture_top_level_values(): void
+    {
+        $flag = true;
+        $nested = 'before';
+        $model = (new MappingModel())->fillable(['active', 'preferences']);
+        $chain = AttributeMapper::from(['active' => &$flag, 'preferences' => ['state' => &$nested]])
+            ->forModel($model)
+            ->merge(['external_flag' => &$flag]);
+
+        $array = $chain->toArray();
+        $collection = $chain->collect();
+        $flag = false;
+        $nested = 'after';
+
+        $previous = ['active' => true, 'preferences' => ['state' => 'after'], 'external_flag' => true];
+        self::assertSame($previous, $array);
+        self::assertSame($previous, $collection->all());
+
+        $array['external_flag'] = true;
+        $collection->put('external_flag', true);
+        $current = ['active' => false, 'preferences' => ['state' => 'after'], 'external_flag' => false];
+        self::assertSame($current, $chain->toArray());
+        self::assertSame($current, $chain->collect()->all());
     }
 
     /** Normalizes every UUID source to a stable string and applies last-write precedence. */
