@@ -121,6 +121,32 @@ final class AttributeOutputTest extends TestCase
         self::assertSame(['preferences' => [4 => false], 'active' => false], $chain->toArray());
     }
 
+    /** Detaches output fields while retaining references held by the mapping chain. */
+    public function test_outputs_capture_top_level_values(): void
+    {
+        $flag = true;
+        $nested = 'before';
+        $model = (new MappingModel())->fillable(['active', 'preferences']);
+        $chain = AttributeMapper::from(['active' => &$flag, 'preferences' => ['state' => &$nested]])
+            ->forModel($model)
+            ->merge(['external_flag' => &$flag]);
+
+        $array = $chain->toArray();
+        $collection = $chain->collect();
+        $flag = false;
+        $nested = 'after';
+
+        $previous = ['active' => true, 'preferences' => ['state' => 'after'], 'external_flag' => true];
+        self::assertSame($previous, $array);
+        self::assertSame($previous, $collection->all());
+
+        $array['external_flag'] = true;
+        $collection->put('external_flag', true);
+        $current = ['active' => false, 'preferences' => ['state' => 'after'], 'external_flag' => false];
+        self::assertSame($current, $chain->toArray());
+        self::assertSame($current, $chain->collect()->all());
+    }
+
     /** Normalizes every UUID source to a stable string and applies last-write precedence. */
     public function test_identifiers_and_last_write_wins(): void
     {

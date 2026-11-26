@@ -257,8 +257,11 @@ final class AttributeMapper
     public function toArray(): array
     {
         [$attributes, $outsideFillable] = $this->map($this->resolveTarget());
+        foreach ($outsideFillable as $attribute => $value) {
+            $attributes[$attribute] = $value;
+        }
 
-        return $attributes + $outsideFillable;
+        return $attributes;
     }
 
     /**
