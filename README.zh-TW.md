@@ -2,11 +2,11 @@
 
 [English](README.md)
 
-Laravel Attribute Mapper 可以把 Form Request 的驗證結果，直接轉成建立或更新 Eloquent Model 要用的屬性陣列。
+Laravel Attribute Mapper 把 Form Request 的驗證結果轉成屬性陣列，可用來新增或更新 Eloquent Model。
 
-- **以 Form Request 和 `$fillable` 為準。** 套件依驗證結果和 Model 的可填清單產生屬性陣列，省去另外維護一份欄位清單。
-- **可指定輸入欄位的命名規則。** `inputKeys()` 可設定命名規則。例如，`inputKeys(InputKeyStyle::Camel)` 可將 `camelCase` 的請求欄位對應到 Model 的 `snake_case` 屬性。
-- **可調整映射結果。** 支援保留或排除指定屬性，也能補入更新者 ID、預設狀態等由應用程式決定的值。
+- 沿用 Model 的 `$fillable` 清單，限制請求資料可填入的屬性。
+- 用 `inputKeys(InputKeyStyle::Camel)` 把 `camelCase` 的輸入欄位對應到 `snake_case` 的 Model 屬性。也能用別名指定個別屬性的來源鍵。
+- 保留或排除指定屬性，也能補入更新者 ID、預設狀態等由應用程式提供的值。
 
 ## 系統需求
 
@@ -16,6 +16,8 @@ Laravel Attribute Mapper 可以把 Form Request 的驗證結果，直接轉成�
 | 13.x | PHP 8.x 系列的 8.3 以上版本 | 8.3、8.4、8.5 |
 
 ## 安裝
+
+在 Laravel 專案根目錄執行以下指令。
 
 ```sh
 composer require mattmy/laravel-attribute-mapper
@@ -66,12 +68,12 @@ Route::get('/mapping-example', static function (MappingExampleRequest $request):
 });
 ```
 
-開啟 `/mapping-example?startTime=2026-12-01&endTime=2026-12-02`，就會收到 `{"start_time":"2026-12-01","end_time":"2026-12-02"}`。建立和更新資料的控制器也能用同樣的寫法產生屬性陣列。
+開啟 `/mapping-example?startTime=2026-12-01&endTime=2026-12-02`，就會收到 `{"start_time":"2026-12-01","end_time":"2026-12-02"}`。
 
 應用程式已經準備好資料時，也可以把陣列傳給 `AttributeMapper::from()`。
 
 ## 完整文件
 
-想知道怎麼讀取其他請求資料、調整欄位對照或處理錯誤，可以看[完整文件](https://mattmy.github.io/laravel-attribute-mapper-doc/zh-TW/guide/getting-started)。
+[開始使用](https://mattmy.github.io/laravel-attribute-mapper-doc/zh-TW/guide/getting-started) · [API 參考](https://mattmy.github.io/laravel-attribute-mapper-doc/zh-TW/guide/api-reference)
 
 [版本變更紀錄](CHANGELOG.md) · [MIT 授權條款](LICENSE)
