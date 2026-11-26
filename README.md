@@ -4,9 +4,9 @@
 
 Laravel Attribute Mapper turns a Form Request's validated data into the attribute array you need to create or update an Eloquent model.
 
-- **Mapping based on Form Request and `$fillable`.** The mapper uses validated input and the model's fillable list to build the attribute array, so you have one fewer field list to maintain.
-- **Configurable input key styles.** `inputKeys()` sets the naming style. For example, `inputKeys(InputKeyStyle::Camel)` matches `camelCase` request keys to `snake_case` model attributes.
-- **Customizable mapped attributes.** You can keep or exclude specific attributes and add values from your app, such as the editor's ID or a default status.
+- Reuse your model's `$fillable` list to limit which attributes request data can populate.
+- Match `camelCase` input to `snake_case` attributes with `inputKeys(InputKeyStyle::Camel)`. Use an alias to choose the input key for a specific attribute.
+- Keep or exclude specific attributes and add values from your app, such as the editor's ID or a default status.
 
 ## Requirements
 
@@ -16,6 +16,8 @@ Laravel Attribute Mapper turns a Form Request's validated data into the attribut
 | 13.x | PHP 8.3 or later in the 8.x series | 8.3, 8.4, 8.5 |
 
 ## Installation
+
+Run this from your Laravel project root.
 
 ```sh
 composer require mattmy/laravel-attribute-mapper
@@ -66,12 +68,12 @@ Route::get('/mapping-example', static function (MappingExampleRequest $request):
 });
 ```
 
-Visit `/mapping-example?startTime=2026-12-01&endTime=2026-12-02` to get `{"start_time":"2026-12-01","end_time":"2026-12-02"}`. Use the same mapping in your create and update controllers to build the attribute array.
+Visit `/mapping-example?startTime=2026-12-01&endTime=2026-12-02` to get `{"start_time":"2026-12-01","end_time":"2026-12-02"}`.
 
 When your app already has the data in an array, you can pass that array to `AttributeMapper::from()`.
 
 ## Documentation
 
-For other ways to read request data, change field mappings, or handle errors, see the [full documentation](https://mattmy.github.io/laravel-attribute-mapper-doc/guide/getting-started).
+[Getting started](https://mattmy.github.io/laravel-attribute-mapper-doc/guide/getting-started) · [API reference](https://mattmy.github.io/laravel-attribute-mapper-doc/guide/api-reference)
 
 [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
